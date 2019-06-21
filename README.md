@@ -20,8 +20,9 @@ bytes possible except byte representation of ' '.
 > toks := tok | tok newline toks\
 > tok := id space regex '{' cpp-code '}'\
 > | id space regex space '{' cpp-code '}'\
-> regex := expr | expr '|' expr \
-> expr := atom | atom expr
+> regex := expr1 | regex '|' expr1 \
+> expr0 := expr1 '*' | expr1 '+'\
+> expr1 := atom | atom expr1\
 > atom := range | var | .\
 > range := '[' range-chars ']'\
 > range-chars := range-unit | range-unit range-chars\
