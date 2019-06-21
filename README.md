@@ -6,33 +6,24 @@ Yet another lexer generator parses a lexer specification to C++ code.
 
 *newline* is one or more line-feed or carriage-return characters. *cpp-code* is
 C++-code. *newline* *newline* means at least two consecutive newline
-characters.
+characters. Text between two ' is literal. A single dot . represents all
+bytes possible except byte representation of ' '.
 
-> program := header newline matches EOF
+> space := spacechar | spacechar space\
+> spacechar := ' ' | horizontaltab
+> id := letter | letter id\
+> letter := 'A' | ... | 'Z' | 'a' | ... | 'z'
 
-> header := project newline tokenids newline definitions newline program\
-> project := **!program** newline id\
-> tokenids := **!tokenids** newline ids\
-> ids := id | id newline ids\
-> definitions := **!definitions** newline newline defs\
+> program := defs '%%' toks\
 > defs := def | def newline defs\
-> def := id regex\
-> program := **!program** newline cpp-code
-
-> matches := match | match newline newline matches\
-> match := regex **{** cpp-code **}**\
-> regex := base | base **+** | base **\*** | base **?**\
-> base := literal | range | definition | **{**id**}**\
-> literal := [a-zA-Z0-9] | **.** | escaped | str\
-> escaped := **\\n** | **\\r**\
-> str := **\"**([^"]|\\\")\***\"**\
-> range := **[**rangechars**]** | **[^**rangechars**]**\
-> rangechars := ANY | ANY**-**ANY
-
-The *regex* and *cpp-code* block in *match* are seperated by spaces. So spaces
-in the regex expression are not allowed, when they must be used, ``[  ]``
-should be used.
-
-The ``!.*`` must be right after the newline character(s).
-
-All newlines are automatically converted to unix newlines (line-feed).
+> def := id space regex\
+> toks := tok | tok newline toks\
+> tok := id space regex '{' cpp-code '}'\
+> | id space regex space '{' cpp-code '}'\
+> regex := expr | expr '|' expr \
+> expr := atom | atom expr
+> atom := range | var | .\
+> range := '[' range-chars ']'\
+> range-chars := range-unit | range-unit range-chars\
+> range-unit := . '-' . | ' -' . | . '- ' | .\
+> var := '{' id '}'\
