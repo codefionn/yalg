@@ -12,15 +12,17 @@ characters. Text between two ' is literal. A single dot . represents all
 bytes possible except byte representation of ' '.
 
 > space := spacechar | spacechar space\
-> spacechar := ' ' | horizontaltab
+> spacechar := ' ' | horizontaltab\
 > id := letter | letter id\
 > letter := 'A' | ... | 'Z' | 'a' | ... | 'z'
 
-> program := defs '%%' toks\
+> program := code '%%' defs '%%' toks\
+> code := cpp-code\
 > defs := def | def newline defs\
 > def := id space regex\
 > toks := tok | tok newline toks\
-> tok := id space regex space '{' cpp-code newline '}'\
+> tok := id space regex space '{' cpp-code-tok newline '}'\
+> cpp-code-tok := cpp-code\
 > regex := expr1 | regex '|' expr1 \
 > expr0 := expr1 '*' | expr1 '+'\
 > expr1 := atom | atom expr1\
@@ -28,7 +30,7 @@ bytes possible except byte representation of ' '.
 > range := '[' range-chars ']'\
 > range-chars := range-unit | range-unit range-chars\
 > range-unit := . '-' . | ' -' . | . '- ' | .\
-> var := '{' id '}'\
+> var := '{' id '}'
 
 ### Basic Interpretation
 
@@ -36,16 +38,16 @@ Let *Var* be a set consisting of all definitions and tokens, *Expr* an array
 consisting of all tokens (the array start with index 0). I\[*x*\] is a function
 for interpreting defined expression in *BNF*.
 
-> I[program] = I[defs '%%' toks] = I[defs]; I[toks]\
+> I[program] = I[defs '%%' toks] = I[defs]; I[toks]
 
-> I[defs] = I[def | def newline defs] = I[def] | I[def]; I[defs]\
+> I[defs] = I[def | def newline defs] = I[def] | I[def]; I[defs]
 
-> I[def] = I[id space regex] = Var := Var AND x, where x has name *id* and match *regex*\
+> I[def] = I[id space regex] = Var := Var AND x, where x has name *id* and match *regex*
 
-> I[toks] = I[tok | tok newline toks] = I[tok] | I[tok]; I[toks]\
+> I[toks] = I[tok | tok newline toks] = I[tok] | I[tok]; I[toks]
 
 > I[tok] = I[id space regex space '{' cpp-code newline '}'] =\
-> Var := Var AND x, where x has name *id* and match *regex*;\
+> Var := Var AND x, where x has name *id* and match *regex*;
 
 > Expr[Expr.length] := y, where y has name *id*, match *regex* and attached
 > code *cpp-code*
