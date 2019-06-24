@@ -28,7 +28,7 @@ is literal. A single dot . represents all bytes possible except ' ', '*',
 > atom := range | var | .\
 > range := '[' range-chars ']'\
 > range-chars := range-unit | range-unit range-chars\
-> range-unit := escape-char '-' escape-char | ' -' escape-char | escape-char '- ' | escape-char\
+> range-unit := char '-' char | ' -' char | char '- ' | char\
 > var := '{' id '}'
 
 ### Basic Interpretation
