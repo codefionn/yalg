@@ -6,30 +6,29 @@ Yet another lexer generator parses a lexer specification to C++ code.
 
 ### BNF
 
-*newline* is one or more line-feed or carriage-return characters. *cpp-code* is
-C++-code. *newline* *newline* means at least two consecutive newline
-characters. Text between two ' is literal. A single dot . represents all
-bytes possible except byte representation of ' '.
+*newline* is one or more line-feed or carriage-return characters. *newline*
+*newline* means at least two consecutive newline characters. Text between two '
+is literal. A single dot . represents all bytes possible except ' ', '*',
+'+' and '\\'.
 
 > space := spacechar | spacechar space\
 > spacechar := ' ' | horizontaltab\
 > id := letter | letter id\
-> letter := 'A' | ... | 'Z' | 'a' | ... | 'z'
+> letter := 'A' | ... | 'Z' | 'a' | ... | 'z'\
+> char := . | '\' escape-char\
+> escape-char := 'n' | 'r' | 't' | .
 
-> program := code '%%' defs '%%' toks\
-> code := cpp-code\
+> program := defs '%%' toks\
 > defs := def | def newline defs\
 > def := id space regex\
-> toks := tok | tok newline toks\
-> tok := id space regex space '{' cpp-code-tok newline '}'\
-> cpp-code-tok := cpp-code\
+> toks := defs
 > regex := expr1 | regex '|' expr1 | '(' regex ')' \
 > expr0 := expr1 '*' | expr1 '+'\
 > expr1 := atom | atom expr1\
 > atom := range | var | .\
 > range := '[' range-chars ']'\
 > range-chars := range-unit | range-unit range-chars\
-> range-unit := . '-' . | ' -' . | . '- ' | .\
+> range-unit := escape-char '-' escape-char | ' -' escape-char | escape-char '- ' | escape-char\
 > var := '{' id '}'
 
 ### Basic Interpretation
@@ -42,15 +41,14 @@ for interpreting defined expression in *BNF*.
 
 > I[defs] = I[def | def newline defs] = I[def] | I[def]; I[defs]
 
-> I[def] = I[id space regex] = Var := Var AND x, where x has name *id* and match *regex*
+> I[def] = I[id space regex] =
+> Var = Var AND x, where x has name *id* and match *regex*
 
-> I[toks] = I[tok | tok newline toks] = I[tok] | I[tok]; I[toks]
+> I[toks] = I1[def | def newline defs] = I1[def] | I1[def]; I1[defs]
 
-> I[tok] = I[id space regex space '{' cpp-code newline '}'] =\
-> Var := Var AND x, where x has name *id* and match *regex*;
-
-> Expr[Expr.length] := y, where y has name *id*, match *regex* and attached
-> code *cpp-code*
+> I1[def] = I[id space regex] =\
+> { Var = Var AND x, \
+> Expr[Expr.length] := x, where x has name *id* and match *regex* } \
 
 ## Constraints
 
