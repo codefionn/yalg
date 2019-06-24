@@ -35,9 +35,9 @@ typedef int32_t TokenType;
 
 typedef struct {
   TokenType type; //!< Type of the token
-  union value {
-	  char * str;   //!< String value TOK_ID, TOK_NUM, TOK_VAR
-  };
+  union {
+	  char * str;   //!< String value TOK_ID, TOK_NUM
+  } value;
 } Token;
 
 /*!\brief Allocate token.
@@ -76,7 +76,7 @@ bool Lexer_init(Lexer *lex, FILE *input);
  */
 Token *Lexer_next(Lexer *lex);
 
-#ifndef __cplusplus
+#ifdef __cplusplus
 }
 #endif
 
