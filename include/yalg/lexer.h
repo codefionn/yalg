@@ -1,26 +1,32 @@
 #ifndef YALG_LEXER_H
 #define YALG_LEXER_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /*!\file yalg/lexer.h
  * \brief Lexical analysis/tokenizer
  */
 
 #include "yalg/global.h"
 
-typedef uint32_t TokenType;
+typedef int32_t TokenType;
 
-#define  TOK_ID      256,     //!< identifier
-#define  TOK_STR     257,     //!< string (C++)
-#define  TOK_CHAR    258,     //!< character (C++)
-#define  TOK_NEWLINE 259,     //!< newline
+#define  TOK_EOF     EOF     //!< End-of-line
+#define  TOK_ID      256     //!< identifier
+#define  TOK_VAR     257     //!< variable
+#define  TOK_NEWLINE 259     //!< newline
+#define  TOK_SECTION 260     //!< '%%'
+#define  TOK_SPACE   261     //!< space(s)
+#define  TOK_CPP     262     //!< CPP-Code
   
-#define  TOK_ERR     300,     //!< Token value reserved for errors
+#define  TOK_ERR     300     //!< Token value reserved for errors
 
 typedef struct {
   TokenType type; //!< Type of the token
   union value {
-	  char ch;      //!< Character value TOK_CHAR
-	  char * str;   //!< String value TOK_ID, TOK_STR
+	  char * str;   //!< String value TOK_ID
   };
 } Token;
 
@@ -29,7 +35,7 @@ typedef struct {
  * \return Returns NULL if failed to dynamically allocate storage, otherwise
  * not NULL (reference to memory segment).
  */
-Token *Token_alloc(TokenType type);
+Token *Token_alloc(TokenType type, void *userdata);
 
 /*!\brief Frees memory allocated by tok
  * \param tok Memory to free
@@ -44,19 +50,24 @@ Token *Token_copy(Token *tok);
 typedef struct {
   FILE *input;    //!< Input stream
 
-  char ch;        //!< Current character
+  int ch;         //!< Current character 0-255, EOF
   Token *tok;     //!< Current token
 
-  size_t line;    //!< Current line number
+  size_t line;    //!< Current line number. Starting from 0.
 } Lexer;
 
 /*!\brief Initializes lexer. Read-operation on input.
  * \param lex
+ * \return Returns true on success otherwise false.
  */
-void Lexer_init(Lexer *lex);
+bool Lexer_init(Lexer *lex, FILE *input);
 
 /*!\brief Read next token.
  */
 Token *Lexer_next(Lexer *lex);
+
+#ifndef __cplusplus
+}
+#endif
 
 #endif /* YALG_LEXER_H */

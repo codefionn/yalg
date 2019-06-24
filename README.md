@@ -51,3 +51,7 @@ for interpreting defined expression in *BNF*.
 
 > Expr[Expr.length] := y, where y has name *id*, match *regex* and attached
 > code *cpp-code*
+
+## Constraints
+
+Every identifier *id* must contain less than 256 characters.
