@@ -15,18 +15,28 @@ typedef int32_t TokenType;
 
 #define  TOK_EOF     EOF     //!< End-of-line
 #define  TOK_ID      256     //!< identifier
-#define  TOK_VAR     257     //!< variable
 #define  TOK_NEWLINE 259     //!< newline
 #define  TOK_SECTION 260     //!< '%%'
 #define  TOK_SPACE   261     //!< space(s)
-#define  TOK_CPP     262     //!< CPP-Code
-  
+#define  TOK_NUM     262     //!< Reserved in case ...
+
+#define TOK_REGEXO   263     //!< '(' for beginning secondary regex expr
+#define TOK_REGEXC   264     //!< ')' for closing secondary regex expr
+#define TOK_RANGEO   265     //!< '[' for beginning range expr
+#define TOK_RANGEC   266     //!< ']' for ending range expr
+#define TOK_VARO     267     //!< '{' for beginning variable expr
+#define TOK_VARC     268     //!< '}' for ending variable expr
+
+#define TOK_MUL      269     //!< * for zero or multiple occurrences
+#define TOK_ADD      270     //!< + for one or more occurences
+#define TOK_OR       271     //!< | for LHS or RHS case.
+ 
 #define  TOK_ERR     300     //!< Token value reserved for errors
 
 typedef struct {
   TokenType type; //!< Type of the token
   union value {
-	  char * str;   //!< String value TOK_ID
+	  char * str;   //!< String value TOK_ID, TOK_NUM, TOK_VAR
   };
 } Token;
 

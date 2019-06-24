@@ -16,7 +16,7 @@ is literal. A single dot . represents all bytes possible except ' ', '*',
 > id := letter | letter id\
 > letter := 'A' | ... | 'Z' | 'a' | ... | 'z'\
 > char := . | '\' escape-char\
-> escape-char := 'n' | 'r' | 't' | .
+> escape-char := 'n' | 'r' | 't' | '+' | '*' | ' ' | .
 
 > program := defs '%%' toks\
 > defs := def | def newline defs\
