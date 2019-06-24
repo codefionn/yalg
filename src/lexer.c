@@ -82,10 +82,8 @@ void Lexer_free(Lexer *lex) {
 static Token *_Lexer_next_fn(Lexer *lex,
     TokenType toktype, const size_t max,
     int (*validch)(int ch)) {
-  // free last stored token
-  Token_free(lex->tok);
   // allocate string
-  char str[max]; memset(str, 0, sizeof(char)); size_t pos = 0;
+  char str[max]; memset(str, 0, max * sizeof(char)); size_t pos = 0;
   // Read characters as long as validch returns true. 
   // Write them to str as long as toktype IS NOT TOK_ERR.
   // Switch toktype to TOK_ERR if pos >= max.
@@ -103,14 +101,16 @@ static Token *_Lexer_next_fn(Lexer *lex,
   if (toktype == TOK_ERR)
     return lex->tok = Token_alloc(TOK_ERR, NULL);
 
+  size_t len = strlen(str);
   // allocate cpy, because Token_alloc needs dynamically allocated C-string
-  char * cpy = (char*) malloc(strlen(str) * sizeof(char));
-  strcpy(cpy, str); // copy str to cpy
+  char * cpy = (char*) malloc((len+1) * sizeof(char));
+  cpy[len] = '\0';
+  if (pos) strcpy(cpy, str); // copy str to cpy
   // allocate result token
   Token *result = Token_alloc(toktype, cpy);
   if (!result) {
     free(cpy);
-    return NULL;
+    return lex->tok = NULL;
   }
 
   return lex->tok = result;
@@ -129,7 +129,7 @@ static int _isspace(int ch) {
 static Token *_Lexer_next_fn_null(Lexer *lex,
     TokenType toktype, int (*validch)(int ch)) {
   while (validch(lex->ch)) lex->ch = fgetc(lex->input);
-  return Token_alloc(toktype, NULL);
+  return lex->tok = Token_alloc(toktype, NULL);
 }
 
 #define TOK_CHARS_MAX 256
@@ -142,7 +142,7 @@ Token *Lexer_next(Lexer *lex) {
       return Lexer_next(lex);
   }
   // free lex->tok
-  Token_free(lex->tok); lex->tok = NULL;
+  if (lex->tok) Token_free(lex->tok), lex->tok = NULL;
   // simple characters/escape sequence
   switch (lex->ch) {
     case '\\': {
@@ -154,67 +154,67 @@ Token *Lexer_next(Lexer *lex) {
       lex->ch = fgetc(lex->input); // eat
       switch (tmp) {
         case 'n':
-          return Token_alloc('\n', NULL);
+          return lex->tok = Token_alloc('\n', NULL);
         case 't':
-          return Token_alloc('\t', NULL);
+          return lex->tok = Token_alloc('\t', NULL);
         case 'r':
-          return Token_alloc('\r', NULL);
+          return lex->tok = Token_alloc('\r', NULL);
         case '\n':
           ++(lex->line);
         default:
-          return Token_alloc(tmp, NULL);
+          return lex->tok = Token_alloc(tmp, NULL);
       }
     }
     case '\n':
       // newline
       lex->ch = fgetc(lex->input); // eat
-      return Token_alloc(TOK_NEWLINE, NULL);
+      return lex->tok = Token_alloc(TOK_NEWLINE, NULL);
     case '%':
       // single % or TOK_SECTION
       lex->ch = fgetc(lex->input); // eat
       switch (lex->ch) {
         case '%':
           lex->ch = fgetc(lex->input); // eat
-          return Token_alloc(TOK_SECTION, NULL);
+          return lex->tok = Token_alloc(TOK_SECTION, NULL);
         default:
-          return Token_alloc('%', NULL);
+          return lex->tok = Token_alloc('%', NULL);
       }
     case '(':
       // secondary regex expression
       lex->ch = fgetc(lex->input); // eat
-      return Token_alloc(TOK_REGEXO, NULL);
+      return lex->tok = Token_alloc(TOK_REGEXO, NULL);
     case ')':
       // secondary regex expression
       lex->ch = fgetc(lex->input); // eat
-      return Token_alloc(TOK_REGEXC, NULL);
+      return lex->tok = Token_alloc(TOK_REGEXC, NULL);
     case '[':
       // range expression
       lex->ch = fgetc(lex->input); // eat
-      return Token_alloc(TOK_RANGEO, NULL);
+      return lex->tok = Token_alloc(TOK_RANGEO, NULL);
     case ']':
       // range expression
       lex->ch = fgetc(lex->input); // eat
-      return Token_alloc(TOK_RANGEC, NULL);
+      return lex->tok = Token_alloc(TOK_RANGEC, NULL);
     case '{':
       // variable
       lex->ch = fgetc(lex->input); // eat
-      return Token_alloc(TOK_VARO, NULL);
+      return lex->tok = Token_alloc(TOK_VARO, NULL);
     case '}':
       // variable
       lex->ch = fgetc(lex->input); // eat
-      return Token_alloc(TOK_VARC, NULL);
+      return lex->tok = Token_alloc(TOK_VARC, NULL);
     case '+':
       // TOK_ADD
       lex->ch = fgetc(lex->input); // eat
-      return Token_alloc(TOK_ADD, NULL);
+      return lex->tok = Token_alloc(TOK_ADD, NULL);
     case '*':
       // TOK_MUL
       lex->ch = fgetc(lex->input); // eat
-      return Token_alloc(TOK_MUL, NULL);
+      return lex->tok = Token_alloc(TOK_MUL, NULL);
     case '|':
       // TOK_OR
       lex->ch = fgetc(lex->input); // eat
-      return Token_alloc(TOK_OR, NULL); 
+      return lex->tok = Token_alloc(TOK_OR, NULL); 
   }
   // TOK_ID
   if (isalpha(lex->ch))
@@ -225,7 +225,7 @@ Token *Lexer_next(Lexer *lex) {
   // all other characters and EOF
   int tmp = lex->ch;
   lex->ch = fgetc(lex->input);
-  return Token_alloc(tmp, NULL);
+  return lex->tok = Token_alloc(tmp, NULL);
 }
 
 #undef TOK_CHARS_MAX
