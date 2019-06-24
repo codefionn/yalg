@@ -72,6 +72,10 @@ typedef struct {
  */
 bool Lexer_init(Lexer *lex, FILE *input);
 
+/*!\brief Frees resources used by lex. Not lex itself.
+ */
+void Lexer_free(Lexer *lex);
+
 /*!\brief Read next token.
  */
 Token *Lexer_next(Lexer *lex);

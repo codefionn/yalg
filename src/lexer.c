@@ -60,10 +60,15 @@ bool Lexer_init(Lexer *lex, FILE *input) {
   if (!(lex->tok))
     return false;
 
-  lex->ch = fgetc(input);
+  lex->ch = fgetc(input); // read first character
   lex->line = 0;
 
   return true;
+}
+
+void Lexer_free(Lexer *lex) {
+  if (lex->tok)
+    free(lex->tok), lex->tok = NULL;
 }
 
 /*!\return Returns NULL on failure, otherwise a valid token,
