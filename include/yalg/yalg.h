@@ -1,11 +1,11 @@
-#ifndef YALG_YALG_HPP
-#define YALG_YALG_HPP
+#ifndef YALG_YALG_H
+#define YALG_YALG_H
 
-/*!\file yalg/yalg.hpp
+/*!\file yalg/yalg.h
  * \brief Library include file
  */
 
-#include "yalg/global.hpp"
-#include "yalg/lexer.hpp"
+#include "yalg/global.h"
+#include "yalg/lexer.h"
 
-#endif /* YALG_YALG_HPP */
+#endif /* YALG_YALG_H */

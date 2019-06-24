@@ -1,11 +1,11 @@
-#ifndef YALG_LEXER_HPP
-#define YALG_LEXER_HPP
+#ifndef YALG_LEXER_H
+#define YALG_LEXER_H
 
-/*!\file yalg/lexer.hpp
+/*!\file yalg/lexer.h
  * \brief Lexical analysis/tokenizer
  */
 
-#include "yalg/global.hpp"
+#include "yalg/global.h"
 
 typedef uint32_t TokenType;
 
@@ -59,4 +59,4 @@ void Lexer_init(Lexer *lex);
  */
 Token *Lexer_next(Lexer *lex);
 
-#endif /* YALG_LEXER_HPP */
+#endif /* YALG_LEXER_H */

@@ -1,10 +1,10 @@
-#ifndef YALG_GLOBAL_HPP
-#define YALG_GLOBAL_HPP
+#ifndef YALG_GLOBAL_H
+#define YALG_GLOBAL_H
 
 /*!\file yalg/global.hpp
  * \brief Handles external includes and definitions
  */
 
-#include <iostream>
+#include <stdio.h>
 
-#endif /* YALG_GLOBAL_HPP */
+#endif /* YALG_GLOBAL_H */
