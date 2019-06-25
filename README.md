@@ -47,8 +47,8 @@ for interpreting defined expression in *BNF*.
 > I[toks] = I1[def | def newline defs] = I1[def] | I1[def]; I1[defs]
 
 > I1[def] = I[id space regex] =\
-> { Var = Var AND x, \
-> Expr[Expr.length] := x, where x has name *id* and match *regex* } \
+> { Var = Var AND x,
+> Expr[Expr.length] := x, where x has name *id* and match *regex* }
 
 ## Constraints
 
